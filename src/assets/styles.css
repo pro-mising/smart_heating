@@ -1,0 +1,135 @@
+/* src/assets/styles.css */
+/* ===== 智能供暖系统全局样式 ===== */
+
+/* 1. 基础变量定义 */
+:root {
+  /* 主色调 */
+  --heating-primary: #ff6b35;
+  /* 暖橙色 - 用于高温警示 */
+  --heating-secondary: #004e89;
+  /* 科技蓝 - 主界面色调 */
+  --heating-safe: #4cb944;
+  /* 安全绿色 - 正常温度范围 */
+
+  /* 设备状态色 */
+  --device-online: #2ecc71;
+  --device-offline: #e74c3c;
+  --device-warning: #f39c12;
+
+  /* 温度刻度 */
+  --temp-low: #3498db;
+  /* 低温色 */
+  --temp-mid: #f1c40f;
+  /* 中温色 */
+  --temp-high: #e74c3c;
+  /* 高温色 */
+}
+
+/* 2. 全局重置 */
+body {
+  font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
+  background-color: #f5f7fa;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* 3. 温度计专用样式 */
+.temperature-gauge {
+  position: relative;
+  background: linear-gradient(to right,
+      var(--temp-low) 0%,
+      var(--temp-mid) 50%,
+      var(--temp-high) 100%);
+  height: 8px;
+  border-radius: 4px;
+  margin: 15px 0;
+}
+
+.temperature-marker {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border: 3px solid var(--heating-secondary);
+  border-radius: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 4. 设备控制面板 */
+.device-panel {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 76, 137, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.device-status {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.device-status.online {
+  background-color: var(--device-online);
+  animation: pulse 2s infinite;
+}
+
+.device-status.offline {
+  background-color: var(--device-offline);
+}
+
+/* 5. 动画效果 */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(46, 204, 113, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+  }
+}
+
+/* 6. 响应式布局 */
+@media (max-width: 768px) {
+  .temperature-gauge {
+    height: 6px;
+  }
+
+  .device-panel {
+    padding: 15px;
+  }
+}
+
+/* 7. 覆盖Element UI组件 */
+.el-button--heating {
+  background: var(--heating-secondary);
+  border-color: var(--heating-secondary);
+  color: white;
+}
+
+.el-button--heating:hover {
+  background: #003366;
+  border-color: #003366;
+}
+
+/* 8. 温度报警样式 */
+.temp-alarm {
+  animation: blink 1.5s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    background-color: rgba(255, 107, 53, 0.2);
+  }
+}

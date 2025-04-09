@@ -1,0 +1,39 @@
+{
+  "name": "smart-heating2.0",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "fix-deps": "npm install --save vue@2.6.14 && npm install --save-dev vue-template-compiler@2.6.14"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "axios": "^0.27.2",
+    "buffer": "^6.0.3",
+    "core-js": "^3.8.3",
+    "echarts": "^5.3.3",
+    "element-ui": "^2.15.12",
+    "process": "^0.11.10",
+    "vue": "^2.6.14",
+    "vue-router": "^3.5.4",
+    "vuex": "^3.6.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^4.5.19",
+    "@vue/cli-plugin-eslint": "^4.5.19",
+    "@vue/cli-service": "^4.5.19",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-vue": "^6.2.2",
+    "sass": "^1.86.1",
+    "sass-loader": "^10.2.1",
+    "vue-template-compiler": "^2.6.14"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
