@@ -19,7 +19,6 @@ public class Heatdata {
     private Double humidity;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private Date date;
-    private String heatdatacol;
     private String address;
     private Double secondTemperature;
     private Double firstTemperature;
