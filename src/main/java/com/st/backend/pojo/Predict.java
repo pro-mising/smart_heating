@@ -13,5 +13,5 @@ public class Predict {
     @TableId(type = IdType.AUTO) //ID自增
     private Integer id;
     private Double secondTemperature;
-    private Double energy;
+    private Double heat;
 }

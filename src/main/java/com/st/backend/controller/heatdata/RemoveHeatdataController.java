@@ -15,7 +15,7 @@ public class RemoveHeatdataController {
     @Autowired
     private RemoveHeatdataService removeHeatdataService;
 
-    @PostMapping("/heatdata/remove/")
+    @PostMapping("/heatdata/remove")
     public Map<String, String> removeHeatdata(@RequestParam Map<String, String> data) {
         System.out.println("removeHeatdata success");
         return removeHeatdataService.remove(data);

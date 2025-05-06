@@ -13,7 +13,7 @@ public class RemoveUserController {
     @Autowired
     private RemoveUserService removeUserService;
 
-    @PostMapping("/user/admin/removeuser/")
+    @PostMapping("/user/admin/removeuser")
     public Map<String,String> removeUser(@RequestParam Map<String,String> data){
         int id= Integer.parseInt(data.get("id"));
         return removeUserService.removeUser(id);

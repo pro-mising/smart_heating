@@ -19,7 +19,7 @@ public class AddHeatdataController {
     @Autowired
     private AddHeatdataService addHeatdataService;
 
-    @PostMapping("/heatdata/add/")
+    @PostMapping("/heatdata/add")
     public Map<String, String> add(@RequestParam Map<String, String> data) {
         System.out.println("addheatdatacontroller success");
         Double roomTemperature = Double.parseDouble(data.get("roomTemperature"));
