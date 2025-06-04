@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能供暖系统 - 登录</title>
+    <style>
+        :root {
+            --primary: #00d4ff;
+            --secondary: #0072ff;
+            --dark: #0a192f;
+            --light: #ccd6f6;
+            --warning: #ff6b35;
+        }
+        body {
+            background: linear-gradient(135deg, var(--dark) 0%, #020c1b 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--light);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-container {
+            width: 400px;
+            background: rgba(16, 36, 69, 0.8);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0,212,255,0.1) 0%, transparent 70%);
+            z-index: -1;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo h1 {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .logo p {
+            color: rgba(204, 214, 246, 0.7);
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary);
+            font-size: 14px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(10, 25, 47, 0.5);
+            border: 1px solid #1f3a68;
+            border-radius: 6px;
+            color: var(--light);
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+        }
+        .captcha-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .captcha-image {
+            flex: 1;
+            height: 40px;
+            background: #0a192f;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: #333;
+            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="40" xmlns="http://www.w3.org/2000/svg"><path d="M0,0 L100,40 M100,0 L0,40" stroke="rgba(0,0,0,0.1)" stroke-width="1"/></svg>');
+            background-size: 20px 20px;
+            user-select: none;
+        }
+        .refresh-btn {
+            width: 40px;
+            background: rgba(10, 25, 47, 0.5);
+            border: 1px solid #1f3a68;
+            border-radius: 6px;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .refresh-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+        }
+        .footer-links {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .footer-links a {
+            color: rgba(204, 214, 246, 0.7);
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>智能供暖控制平台</h1>
+            <p>基于AI算法的智慧供暖管理系统</p>
+        </div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" class="form-control" placeholder="请输入用户名" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" class="form-control" placeholder="请输入密码" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="captcha">验证码</label>
+                <input type="text" id="captcha" class="form-control" placeholder="请输入验证码" required>
+                <div class="captcha-container">
+                    <div class="captcha-image" id="captchaImage">A7B9</div>
+                    <button type="button" class="refresh-btn" id="refreshCaptcha">↻</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" class="btn">登录系统</button>
+            </div>
+        </form>
+        
+        <div class="footer-links">
+            <a href="#">忘记密码?</a>
+            <a href="#">注册新账号</a>
+        </div>
+    </div>
+
+    <script>
+        function generateCaptcha() {
+            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let captcha = '';
+            for (let i = 0; i < 4; i++) {
+                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return captcha;
+        }
+
+        function updateCaptcha() {
+            const captcha = generateCaptcha();
+            document.getElementById('captchaImage').textContent = captcha;
+            
+            // 添加干扰线效果
+            const captchaImage = document.getElementById('captchaImage');
+            captchaImage.style.backgroundImage = `
+                url('data:image/svg+xml;utf8,<svg width="100" height="40" xmlns="http://www.w3.org/2000/svg">
+                    ${Array.from({length: 5}, (_, i) => 
+                        `<path d="M${Math.random()*100},${Math.random()*40} L${Math.random()*100},${Math.random()*40}" 
+                        stroke="rgba(0,0,0,${0.1 + Math.random()*0.2})" stroke-width="1"/>`
+                    ).join('')}
+                </svg>')
+            `;
+        }
+
+        updateCaptcha();
+
+        document.getElementById('refreshCaptcha').addEventListener('click', updateCaptcha);
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userInput = document.getElementById('captcha').value.toUpperCase();
+            const captcha = document.getElementById('captchaImage').textContent;
+            
+            if (userInput !== captcha) {
+                alert('验证码错误，请重新输入！');
+                updateCaptcha();
+                return;
+            }
+            
+            // 这里添加实际的登录逻辑
+            alert('登录验证通过！');
+        });
+    </script>
+</body>
+</html>

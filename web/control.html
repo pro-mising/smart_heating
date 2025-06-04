@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智能供暖系统 - 集中控制台</title>
+  <style>
+    :root {
+      --primary: #00d4ff;
+      --secondary: #0072ff;
+      --dark: #0a192f;
+      --light: #ccd6f6;
+      --success: #4cb944;
+      --warning: #ff6b35;
+    }
+
+    body {
+      background-color: var(--dark);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--light);
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 50px;
+      background-color: rgba(10, 25, 47, 0.9);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border-radius: 8px;
+      margin-right: 15px;
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: bold;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+    }
+
+    .nav-links a {
+      color: var(--light);
+      text-decoration: none;
+      font-size: 16px;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .nav-links a.active {
+      color: var(--primary);
+    }
+
+    .nav-links a.active::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--primary);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #112240;
+      margin-right: 10px;
+      overflow: hidden;
+    }
+
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .username {
+      font-size: 16px;
+    }
+
+    body {
+      background-color: var(--dark);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--light);
+      margin: 0;
+      padding-top: 90px;
+    }
+
+    .control-dashboard {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 25px;
+    }
+
+    .device-list {
+      background: rgba(16, 36, 69, 0.8);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid rgba(100, 255, 218, 0.1);
+      height: fit-content;
+    }
+
+    .panel-title {
+      color: var(--primary);
+      font-size: 18px;
+      margin-top: 0;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .panel-title i {
+      margin-right: 10px;
+    }
+
+    .search-box {
+      margin-bottom: 20px;
+    }
+
+    .search-box input {
+      width: 80%;
+      padding: 10px 15px;
+      background: rgba(10, 25, 47, 0.5);
+      border: 1px solid #1f3a68;
+      border-radius: 6px;
+      color: var(--light);
+      font-size: 14px;
+    }
+
+    .device-item {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: rgba(10, 25, 47, 0.3);
+      border-left: 3px solid transparent;
+    }
+
+    .device-item:hover {
+      background: rgba(0, 212, 255, 0.1);
+    }
+
+    .device-item.active {
+      border-left-color: var(--primary);
+      background: rgba(0, 212, 255, 0.15);
+    }
+
+    .device-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .device-location {
+      font-size: 12px;
+      color: rgba(204, 214, 246, 0.7);
+    }
+
+    .device-status {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 12px;
+    }
+
+    .status-online {
+      color: var(--success);
+    }
+
+    .status-offline {
+      color: var(--warning);
+    }
+
+    .control-panel {
+      background: rgba(16, 36, 69, 0.8);
+      border-radius: 12px;
+      padding: 25px;
+      border: 1px solid rgba(100, 255, 218, 0.1);
+    }
+
+    .control-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .device-title {
+      font-size: 22px;
+      margin: 0;
+    }
+
+    .device-id {
+      color: rgba(204, 214, 246, 0.7);
+      font-size: 14px;
+    }
+
+    .control-section {
+      margin-bottom: 30px;
+    }
+
+    .section-title {
+      color: var(--primary);
+      font-size: 16px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+
+    .section-title i {
+      margin-right: 10px;
+    }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .control-card {
+      background: rgba(10, 25, 47, 0.5);
+      border-radius: 8px;
+      padding: 20px;
+      border: 1px solid #1f3a68;
+      transition: all 0.3s;
+    }
+
+    .control-card:hover {
+      border-color: var(--primary);
+    }
+
+    .control-name {
+      font-size: 14px;
+      margin-bottom: 15px;
+      color: rgba(204, 214, 246, 0.8);
+    }
+
+    .control-value {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .temp-control {
+      color: var(--primary);
+    }
+
+    .pressure-control {
+      color: #a162e8;
+    }
+
+    .flow-control {
+      color: #64ffda;
+    }
+
+    .control-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+
+    .btn {
+      padding: 8px 15px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border: none;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .btn-outline:hover {
+      background: rgba(0, 212, 255, 0.1);
+    }
+
+    .slider-container {
+      margin-top: 15px;
+    }
+
+    .slider {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      background: #1f3a68;
+      border-radius: 3px;
+      outline: none;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: var(--primary);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      font-size: 12px;
+      color: rgba(204, 214, 246, 0.7);
+    }
+
+    .mode-selector {
+      display: flex;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 15px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      background: rgba(10, 25, 47, 0.5);
+      border: none;
+      color: rgba(204, 214, 246, 0.7);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .mode-btn.active {
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
+    }
+
+    .alert-card {
+      background: rgba(231, 76, 60, 0.1);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .alert-icon {
+      color: var(--warning);
+      font-size: 20px;
+      margin-right: 15px;
+    }
+
+    .alert-content {
+      flex: 1;
+    }
+
+    .alert-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .alert-desc {
+      font-size: 14px;
+      color: rgba(204, 214, 246, 0.7);
+    }
+
+    .chart-container {
+      height: 250px;
+      background: rgba(10, 25, 47, 0.3);
+      border-radius: 8px;
+      margin-top: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(204, 214, 246, 0.5);
+      border: 1px dashed #1f3a68;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="logo">
+      <div class="logo-icon"></div>
+      <div class="logo-text">智能供暖控制平台</div>
+    </div>
+    <div class="nav-links">
+      <a href="monitor.html">数据监控</a>
+      <a href="forecast.html">数据预测</a>
+      <a href="control.html" class="active">控制系统</a>
+      <a href="profile.html">用户中心</a>
+    </div>
+    <div class="user-info">
+      <div class="user-avatar">
+        <img src="D:\桌面\供暖项目\smart_heating2.1\smart_heating2.0\src\assets\3.jpg" alt="用户头像">
+      </div>
+      <div class="username">XXX工程师</div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="control-dashboard">
+      <div class="device-list">
+        <h2 class="panel-title">
+          设备列表
+        </h2>
+
+        <div class="search-box">
+          <input type="text" placeholder="搜索设备...">
+        </div>
+
+        <div class="device-item active">
+          <div class="device-name">第五中学-主供暖机组</div>
+          <div class="device-location">教学楼A栋地下室</div>
+          <div class="device-status">
+            <span>在线</span>
+            <span class="status-online">运行中</span>
+          </div>
+        </div>
+
+        <div class="device-item">
+          <div class="device-name">第五中学-备用锅炉</div>
+          <div class="device-location">实验楼西侧</div>
+          <div class="device-status">
+            <span>在线</span>
+            <span class="status-online">待机</span>
+          </div>
+        </div>
+
+        <div class="device-item">
+          <div class="device-name">第三小学-供暖机组</div>
+          <div class="device-location">主教学楼3层</div>
+          <div class="device-status">
+            <span>离线</span>
+            <span class="status-offline">检修中</span>
+          </div>
+        </div>
+
+        <div class="device-item">
+          <div class="device-name">市民中心-中央空调</div>
+          <div class="device-location">B区设备间</div>
+          <div class="device-status">
+            <span>在线</span>
+            <span class="status-online">运行中</span>
+          </div>
+        </div>
+
+        <div class="device-item">
+          <div class="device-name">第一医院-供暖系统</div>
+          <div class="device-location">住院部地下室</div>
+          <div class="device-status">
+            <span>在线</span>
+            <span class="status-online">运行中</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="control-panel">
+        <div class="control-header">
+          <div>
+            <h2 class="device-title">第五中学-主供暖机组</h2>
+            <div class="device-id">设备ID: 00000000000</div>
+          </div>
+          <div>
+            <button class="btn btn-outline">设备详情</button>
+          </div>
+        </div>
+
+        <div class="control-section">
+          <h3 class="section-title">
+            温度控制
+          </h3>
+
+          <div class="control-grid">
+            <div class="control-card">
+              <div class="control-name">供水温度</div>
+              <div class="control-value temp-control">0°C</div>
+              <div class="slider-container">
+                <input type="range" min="50" max="90" value="72" class="slider">
+                <div class="slider-labels">
+                  <span>50°C</span>
+                  <span>90°C</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="control-card">
+              <div class="control-name">回水温度</div>
+              <div class="control-value temp-control">0°C</div>
+              <div class="slider-container">
+                <input type="range" min="30" max="70" value="48" class="slider">
+                <div class="slider-labels">
+                  <span>30°C</span>
+                  <span>70°C</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="control-card">
+              <div class="control-name">室内温度</div>
+              <div class="control-value temp-control">0°C</div>
+              <div class="control-actions">
+                <button class="btn btn-outline">+1°C</button>
+                <button class="btn btn-outline">-1°C</button>
+                <button class="btn btn-primary">应用</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-section">
+          <h3 class="section-title">
+            系统控制
+          </h3>
+
+          <div class="control-grid">
+            <div class="control-card">
+              <div class="control-name">系统压力</div>
+              <div class="control-value pressure-control">0MPa</div>
+              <div class="mode-selector">
+                <button class="mode-btn">自动</button>
+                <button class="mode-btn active">手动</button>
+              </div>
+            </div>
+
+            <div class="control-card">
+              <div class="control-name">水流量</div>
+              <div class="control-value flow-control">0m³/h</div>
+              <div class="mode-selector">
+                <button class="mode-btn active">自动</button>
+                <button class="mode-btn">手动</button>
+              </div>
+            </div>
+
+            <div class="control-card">
+              <div class="control-name">运行模式</div>
+              <div class="mode-selector" style="margin-top: 10px;">
+                <button class="mode-btn">节能</button>
+                <button class="mode-btn active">标准</button>
+                <button class="mode-btn">强力</button>
+              </div>
+              <div class="control-actions" style="margin-top: 15px;">
+                <button class="btn btn-primary" style="width: 100%;">保存设置</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert-card">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-content">
+            <div class="alert-title">系统告警</div>
+            <div class="alert-desc">检测到某管道压力异常，建议立即检查</div>
+          </div>
+          <button class="btn btn-outline">查看详情</button>
+        </div>
+
+        <div class="chart-container">
+          设备运行状态趋势图将在此显示
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
