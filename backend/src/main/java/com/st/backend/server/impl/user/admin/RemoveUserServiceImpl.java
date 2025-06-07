@@ -20,7 +20,7 @@ public class RemoveUserServiceImpl implements RemoveUserService {
     private UserMapper userMapper;
 
     @Override
-    public Map<String, String> removeUser(int id) {
+    public Map<String, String> removeUser(String username) {
         UsernamePasswordAuthenticationToken authenticationToken
                 = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl loginUser = (UserDetailsImpl) authenticationToken.getPrincipal();
@@ -32,10 +32,8 @@ public class RemoveUserServiceImpl implements RemoveUserService {
             return map;
         }
 
-
-
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id",id);
+        queryWrapper.eq("username",username);
         User user1 = userMapper.selectOne(queryWrapper);
         if(user1==null) {
             map.put("error_message", "用户不存在或者已被删除");

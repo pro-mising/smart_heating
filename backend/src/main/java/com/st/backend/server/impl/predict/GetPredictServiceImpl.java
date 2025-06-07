@@ -21,7 +21,7 @@ public class GetPredictServiceImpl implements GetPredictService {
     private PredictMapper predictMapper;
 
     @Override
-    public Map<String, String>getPredictList(int id) {
+    public Map<String, String>getPredictList(String address, String time) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl loggedUser = (UserDetailsImpl) authenticationToken.getPrincipal();
@@ -30,12 +30,13 @@ public class GetPredictServiceImpl implements GetPredictService {
         Map<String,String> map = new HashMap<>();
 
         QueryWrapper<Predict> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id",id);
+
+        queryWrapper.eq("address",address);
+        queryWrapper.eq("time",time);
         Predict predict = predictMapper.selectOne(queryWrapper);
         if(predict!=null){
-            map.put("secondTemperature", String.valueOf(predict.getSecondTemperature()));
-            map.put("heat",  String.valueOf(predict.getHeat()));
             map.put("error_message", "success");
+            map.put("heat_load", String.valueOf(predict.getHeatLoad()));
             return map;
         }
 

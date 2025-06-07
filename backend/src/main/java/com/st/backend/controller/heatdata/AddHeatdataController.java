@@ -22,11 +22,14 @@ public class AddHeatdataController {
     @PostMapping("/heatdata/add")
     public Map<String, String> add(@RequestParam Map<String, String> data) {
         System.out.println("addheatdatacontroller success");
-        Double roomTemperature = Double.parseDouble(data.get("roomTemperature"));
-        Double Humidity = Double.parseDouble(data.get("humidity"));
+        String address = data.get("address");
+        Double indoorTemperature = Double.parseDouble(data.get("indoor_Temperature"));
+        Double outdoorTemperature = Double.parseDouble(data.get("outdoor_Temperature"));
+        Double heatLoad = Double.parseDouble(data.get("heatLoad"));
+        String wind = data.get("wind");
 //        String date =  data.get("datetime");
 
-        String dateStr = data.get("datetime"); // e.g., "2025-05-06 10:30:00"
+        String dateStr = data.get("date"); // e.g., "2025-05-06 10:30:00"
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime localDateTime = LocalDateTime.parse(dateStr, formatter);
 
@@ -37,12 +40,6 @@ public class AddHeatdataController {
 // 转换为 java.util.Date
         Date date = Date.from(zonedDateTime.toInstant());
 
-        String address = data.get("address");
-        Double secondTemperature = Double.parseDouble(data.get("secondTemperature"));
-        Double firstTemperature = Double.parseDouble(data.get("firstTemperature"));
-        Double wind = Double.parseDouble(data.get("wind"));
-        String equipmentNumber = data.get("equipmentNumber");
-
-        return addHeatdataService.add(roomTemperature, Humidity, date, address,secondTemperature, firstTemperature, wind,equipmentNumber);
+        return addHeatdataService.add(address, date, indoorTemperature, outdoorTemperature,heatLoad, wind);
     }
 }

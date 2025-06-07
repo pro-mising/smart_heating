@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class Predict {
     @TableId(type = IdType.AUTO) //ID自增
     private Integer id;
-    private Double secondTemperature;
-    private Double heat;
+    private String address;
+    private Double heatLoad;
+    private String time;
 }

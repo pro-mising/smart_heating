@@ -18,7 +18,11 @@ public class RegisterController {
         String username = map.get("username");
         String password = map.get("password");
         String confirmPassword = map.get("confirmPassword");
+        String email = map.get("email");
+        String phone = map.get("phone");
+        String realname = map.get("realname");
+        String department  = map.get("department");
         System.out.println("registercontroller success");
-        return registerService.getToken(username, password, confirmPassword);
+        return registerService.getToken(username,realname, password, confirmPassword, phone, email, department);
     }
 }

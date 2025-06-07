@@ -15,7 +15,7 @@ public class RemoveUserController {
 
     @PostMapping("/user/admin/removeuser")
     public Map<String,String> removeUser(@RequestParam Map<String,String> data){
-        int id= Integer.parseInt(data.get("id"));
-        return removeUserService.removeUser(id);
+        String username = data.get("username");
+        return removeUserService.removeUser(username);
     }
 }

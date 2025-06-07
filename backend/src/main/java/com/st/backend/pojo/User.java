@@ -13,7 +13,11 @@ public class User {
     @TableId(type = IdType.AUTO) //ID自增
     private Integer id;
     private String username;
+    private String realname;
     private String password;
     private String photo;
+    private String phone;
+    private String email;
+    private String department;
     private Integer flag;
 }

@@ -20,15 +20,14 @@ public class AddHeatdataServiceImpl implements AddHeatdataService {
     private HeatdataMapper heatdataMapper;
 
     @Override
-    public Map<String, String> add(Double roomTemperature,
-                                   Double humidity, Date date, String address, Double secondTemperature, Double firstTemperature, Double wind, String equipmentNumber) {
+    public Map<String, String> add(String address, Date date, Double indoorTemperature, Double outdoorTemperature, Double heatLoad, String wind) {
         Map<String, String> map = new HashMap<>();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
         User user = loginUser.getUser();
 
-        Heatdata heatdata = new Heatdata(null, roomTemperature, humidity, date,
-                address, secondTemperature, firstTemperature,wind, equipmentNumber);
+        Heatdata heatdata = new Heatdata(null, address, date, indoorTemperature,
+                outdoorTemperature, heatLoad, wind);
         heatdataMapper.insert(heatdata);
 
         System.out.println("Add HeatdataService success");

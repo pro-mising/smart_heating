@@ -1,10 +1,14 @@
-package com.st.backend.server.impl.user;
+package com.st.backend.server.impl.user.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.st.backend.mapper.UserMapper;
 import com.st.backend.pojo.User;
-import com.st.backend.server.user.RegisterService;
+import com.st.backend.server.impl.utils.UserDetailsImpl;
+import com.st.backend.server.user.admin.AddUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class RegisterServiceImpl implements RegisterService {
+public class AddUserServiceImpl implements AddUserService {
+
     @Autowired
     private UserMapper userMapper;
 
@@ -21,10 +26,20 @@ public class RegisterServiceImpl implements RegisterService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public Map<String, String> getToken(String username,String realname, String password, String confirmPassword,String  phone, String email,String department) {
+    public Map<String, String> addUser(String username, String realname, String password, String phone, String email, String department) {
+        UsernamePasswordAuthenticationToken authenticationToken
+                = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl loginUser = (UserDetailsImpl) authenticationToken.getPrincipal();
+        User user1 = loginUser.getUser();
+
         Map<String, String> map = new HashMap<>();
         if(username == null) {
             map.put("error_message", "用户名不能为空");
+            return map;
+        }
+
+        if(user1.getFlag()  == 0) {
+            map.put("error_message", "没有权限进行此操作");
             return map;
         }
 
@@ -37,11 +52,6 @@ public class RegisterServiceImpl implements RegisterService {
 
         if(realname == null) {
             map.put("error_message", "真实姓名不能为空");
-            return map;
-        }
-
-        if(confirmPassword == null) {
-            map.put("error_message", "确认密码不能为空");
             return map;
         }
 
@@ -70,11 +80,6 @@ public class RegisterServiceImpl implements RegisterService {
             return map;
         }
 
-        if(confirmPassword.isEmpty()) {
-            map.put("error_message", "确认密码不能为空");
-            return map;
-        }
-
         if(phone.isEmpty()) {
             map.put("error_message", "电话不能为空");
             return map;
@@ -90,12 +95,7 @@ public class RegisterServiceImpl implements RegisterService {
             return map;
         }
 
-        if(password.length() > 100 || confirmPassword.length() > 100) {
-            map.put("error_message", "密码长度不能大于100");
-            return map;
-        }
-
-        if(!password.equals(confirmPassword)) {
+        if(password.length() > 100) {
             map.put("error_message", "密码长度不能大于100");
             return map;
         }

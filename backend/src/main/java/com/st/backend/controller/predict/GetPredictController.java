@@ -17,7 +17,8 @@ public class GetPredictController {
     @GetMapping("/predict/get")
     public Map<String,String> getPredict(@RequestParam Map<String,String> data){
         System.out.println("getPredict controller success");
-        int id = Integer.parseInt(data.get("id"));
-        return getPredictService.getPredictList(id);
+        String address = data.get("address");
+        String time = data.get("time");
+        return getPredictService.getPredictList(address, time);
     }
 }

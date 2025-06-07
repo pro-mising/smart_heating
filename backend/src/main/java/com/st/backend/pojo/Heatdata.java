@@ -15,13 +15,12 @@ import java.util.Date;
 public class Heatdata {
     @TableId(type = IdType.AUTO) //ID自增
     private Integer id;
-    private Double roomTemperature;
-    private Double humidity;
+    private String address;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private Date date;
-    private String address;
-    private Double secondTemperature;
-    private Double firstTemperature;
-    private Double wind;
-    private String equipmentNumber;
+    private Double indoorTemperature;
+    private Double outdoorTemperature;
+    private Double heatLoad;
+    private String wind;
+
 }
