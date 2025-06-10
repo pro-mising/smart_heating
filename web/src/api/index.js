@@ -1,19 +1,24 @@
 import axios from 'axios'
 import store from '@/store'
+import qs from 'qs'
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: process.env.VUE_APP_API_BASE_URL || '/api',
+  baseURL: process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:3002', // 统一管理
   timeout: 5000
-})
+});
 
 // 请求拦截器
 service.interceptors.request.use(
   config => {
+    // 从store获取token
+    const token = store.state.token
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`
+    }
     return config
   },
   error => {
-    // 对请求错误做些什么
     return Promise.reject(error)
   }
 )
@@ -52,15 +57,16 @@ export default {
 
   // 登录
   login(username, password) {
-    return service.post('http://127.0.0.1:3002/user/login', {
-      username: username,
-      password: password,
-    }, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+    return service.post('/user/login', 
+      qs.stringify({ username, password }), // 必须转换格式
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
       }
-    });
+    );
   },
+
 
   // 获取用户信息
   getUserInfo() {
@@ -142,4 +148,30 @@ export default {
       }  //验证方式是 "Bearer " + 用户的token， 注意Bearer 后面有个空格
     });
   },
+
+  getUserList() {
+    return service.get('http://127.0.0.1:3002/user/admin/getuserlist', {
+        headers: {
+            Authorization: "Bearer " + store.state.token,
+        } //验证方式是 "Bearer " + 用户的token， 注意Bearer 后面有个空格
+    })
+  },
+
+  adminUpdateUserInfo(username, realname, email, phone, department) {
+    return service.post('http://127.0.0.1:3002/user/admin/updateuser',
+        qs.stringify({ // ✅ 编码参数
+            username,
+            realname,
+            email,
+            phone,
+            department
+        }),
+        {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                Authorization: "Bearer " + store.state.token,
+            }
+        }
+    );
+},
 }

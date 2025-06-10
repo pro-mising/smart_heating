@@ -83,6 +83,7 @@
 
 <script>
 import Navbar from '@/components/Navbar.vue'
+import api from '@/api/index'
 
 export default {
   name: 'UserProfile',
@@ -91,11 +92,11 @@ export default {
   },
   data() {
     return {
-      username: 'XXX工程师',
-      realName: 'XXX',
-      email: 'XXX@XXX.com',
-      phone: '110',
-      department: '技术研发部',
+      username: '',
+      realName: '',
+      email: '',
+      phone: '',
+      department: '',
       activities: [
         { icon: '📊', title: '更新了供暖预测算法参数', time: '今天 25:61' },
         { icon: '🔧', title: '维修了第五中学3号供暖设备', time: '昨天 25:62' },
@@ -103,12 +104,60 @@ export default {
       ]
     }
   },
+  created() {
+    this.fetchUserInfo()
+  },
   methods: {
-    saveChanges() {
-      // 保存更改的逻辑
-      alert('用户信息已保存')
+    async fetchUserInfo() {
+      try {
+        const res = await api.getUserInfo() // 调用后端接口
+        if (res.error_message === 'success') {
+          this.username = res.username || ''
+          this.realName = res.realname || ''
+          this.email = res.email || ''
+          this.phone = res.phone || ''
+          this.department = res.department || ''
+        } else {
+          this.$message.error('获取用户信息失败')
+        }
+      } catch (err) {
+        console.error('获取用户信息出错:', err)
+        this.$message.error('请求失败，请检查网络')
+      }
+    },
+    async saveChanges() {
+      try {
+        const res = await api.updateUserInfo(
+          this.username,
+          this.realName,
+          this.email,
+          this.phone,
+          this.department
+        )
+
+        console.log('接口返回数据:', res)
+
+        if (res.error_message === 'success') {
+      this.$message({
+        message: '用户信息已成功更新',
+        type: 'success'
+      })
+    } else {
+      this.$message({
+        message: '更新失败: ' + (res.error_message || '未知错误'),
+        type: 'error'
+      })
+    }
+  } catch (error) {
+    console.error('更新用户信息出错:', error)
+    this.$message({
+      message: '请求失败，请稍后重试',
+      type: 'error'
+    })
+      }
     },
     handleSystemMenuClick() {
+      console.log('当前角色:', this.$store.state.role)
       if (!this.$store.getters.isAdmin) {
         this.$alert('抱歉，您不具备相应权限', '权限不足', {
           confirmButtonText: '确定'

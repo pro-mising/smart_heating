@@ -27,6 +27,16 @@
           </div>
         </div>
 
+        <!-- 加载指示器 -->
+        <div v-if="isLoading" class="loading-indicator">
+          <i class="el-icon-loading"></i> 数据加载中...
+        </div>
+  
+         <!-- 空状态提示 -->
+        <div v-else-if="!isLoading && monitorData.length === 0" class="no-data">
+          <i class="el-icon-warning-outline"></i> 没有找到匹配的数据
+        </div>
+
         <table class="data-table">
           <thead>
             <tr>
@@ -34,7 +44,7 @@
               <th>采集时间</th>
               <th>外部温度(℃)</th>
               <th>室温(℃)</th>
-              <th>风力(m/s)</th>
+              <th>风力(级)</th>
               <th>热负荷(kW)</th>
               <th>操作</th>
             </tr>
@@ -67,12 +77,20 @@
         <div class="pagination-wrapper">
           <div class="pagination">
             <button @click="prevPage" :disabled="currentPage === 1">上一页</button>
-            <button v-for="page in totalPages" 
-                    :key="page" 
-                    @click="goToPage(page)"
-                    :class="{active: currentPage === page}">
-              {{ page }}
-            </button>
+            <template v-for="item in paginationItems">
+              <button 
+                v-if="item.type === 'ellipsis'"
+                disabled
+                class="ellipsis"
+                :key="'ellipsis-' + item.value"
+              >...</button>
+              <button 
+                v-else
+                @click="goToPage(item.value)"
+                :class="{active: currentPage === item.value}"
+                :key="item.value"
+              >{{ item.value }}</button>
+            </template>
             <button @click="nextPage" :disabled="currentPage === totalPages">下一页</button>
           </div>
         </div>
@@ -84,6 +102,7 @@
 <script>
 import Navbar from '@/components/Navbar.vue'
 import api from '@/api'
+import { debounce } from 'lodash'
 
 export default {
   name: 'DataMonitor',
@@ -92,85 +111,141 @@ export default {
   },
   data() {
     return {
-      searchQuery: '',
-      currentPage: 1,
-      itemsPerPage: 10,
-      monitorData: [
-        {
-          id: 1,
-          location: '第五中学-教学楼',
-          time: new Date(),
-          outTemp: 5,
-          roomTemp: 22,
-          windSpeed: 3.2,
-          heatLoad: 45.6
-        },
-        {
-          id: 2,
-          location: '第三小学-主楼',
-          time: new Date(),
-          outTemp: 7,
-          roomTemp: 20,
-          windSpeed: 2.8,
-          heatLoad: 38.2
-        },
-        {
-          id: 3,
-          location: '市政府办公楼',
-          time: new Date(),
-          outTemp: 6,
-          roomTemp: 21,
-          windSpeed: 4.1,
-          heatLoad: 52.3
-        },
-        {
-          id: 4,
-          location: '人民医院-住院部',
-          time: new Date(),
-          outTemp: 4,
-          roomTemp: 23,
-          windSpeed: 3.5,
-          heatLoad: 48.7
-        },
-        {
-          id: 5,
-          location: '购物中心-主供暖',
-          time: new Date(),
-          outTemp: 8,
-          roomTemp: 19,
-          windSpeed: 2.3,
-          heatLoad: 42.1
-        }
-      ]
-    }
+    searchQuery: '',
+    currentPage: 1,
+    itemsPerPage: 10,
+    monitorData: [], // 存储所有数据
+    totalDataCount: 0, // 总数据量（用于计算总页数）
+    isLoading: false, // 防止重复加载
+  }
   },
   computed: {
     filteredData() {
-      const start = (this.currentPage - 1) * this.itemsPerPage
-      const end = start + this.itemsPerPage
-      return this.monitorData
-        .filter(item => item.location.includes(this.searchQuery))
-        .slice(start, end)
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.monitorData.slice(start, end);
     },
     totalPages() {
-      return Math.ceil(this.monitorData.length / this.itemsPerPage)
+      return Math.ceil(this.monitorData.length / this.itemsPerPage);
+    },
+    displayedPages() {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const range = 5; // 当前页前后显示的数量
+    let start = Math.max(1, current - range);
+    let end = Math.min(total, current + range);
+    
+    // 如果总页数超过10，添加省略号
+    if (total > 10) {
+      if (current > range + 1) {
+        start = current - range;
+        end = current + range;
+      }
+      
+      if (end > total - 1) {
+        end = total;
+      }
     }
+
+    const pages = [];
+    // 添加第一页
+    if (start > 1) {
+      pages.push(1);
+      if (start > 2) {
+        pages.push('...');
+      }
+    }
+    
+    // 添加中间页
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    // 添加最后一页
+    if (end < total) {
+      if (end < total - 1) {
+        pages.push('...');
+      }
+      pages.push(total);
+    }
+
+    return pages;
+  },
+  paginationItems() {
+    return this.displayedPages.map(page => ({
+      type: page === '...' ? 'ellipsis' : 'page',
+      value: page
+    }));
+  }
   },
   created() {
-    this.fetchData()
+     console.log('组件已创建，调用 fetchData')
+    this.fetchAllData(); 
   },
   methods: {
-    async fetchData() {
-      try {
-        const response = await api.getDevices()
-        this.monitorData = response.data || this.monitorData
-      } catch (error) {
-        console.error('获取数据失败:', error)
+    async fetchAllData() {
+    this.isLoading = true;
+    try {
+      let allData = [];
+      let page = 1;
+      let hasMoreData = true;
+      const maxRequests = 100;
+
+      // 重置数据
+      this.monitorData = [];
+
+      // 循环获取至多100页的数据
+      while (hasMoreData && page <= maxRequests) {
+        const response = await api.getDevices(page, this.searchQuery);
+
+        console.log('接口返回数据:', response)
+
+        if (response.heatdata && response.heatdata.length > 0) {
+          allData = [...allData, ...response.heatdata];
+          page++;
+        } else {
+          hasMoreData = false;
+        }
       }
-    },
-    handleSearch() {
-      this.currentPage = 1
-    },
+
+      // 转换数据格式
+      this.monitorData = allData.map(item => ({
+        id: item.id,
+        location: item.address,
+        time: new Date(item.date),
+        outTemp: item.outdoorTemperature,
+        roomTemp: item.indoorTemperature,
+        windSpeed: parseFloat(item.wind),
+        heatLoad: item.heatLoad,
+      }));
+
+      this.totalDataCount = allData.length;
+    } catch (error) {
+      console.error("获取数据失败:", error);
+    } finally {
+      this.isLoading = false;
+    }
+  },
+ handleSearch: debounce(function() {
+      this.currentPage = 1;
+      this.fetchAllData();
+    }, 500),
+  prevPage() {
+  if (this.currentPage > 1) {
+    this.currentPage--
+    this.fetchAllData()
+  }
+},
+nextPage() {
+  if (this.currentPage < this.totalPages) {
+    this.currentPage++
+    this.fetchAllData()
+  }
+},
+goToPage(page) {
+  this.currentPage = page
+  this.fetchAllData()
+},
     formatTime(date) {
       return date.toLocaleTimeString()
     },
@@ -181,19 +256,10 @@ export default {
       console.log('显示趋势:', item)
     },
     refreshData() {
-      this.fetchData()
+      this.fetchAllData()
     },
     exportData() {
       console.log('导出数据')
-    },
-    prevPage() {
-      if (this.currentPage > 1) this.currentPage--
-    },
-    nextPage() {
-      if (this.currentPage < this.totalPages) this.currentPage++
-    },
-    goToPage(page) {
-      this.currentPage = page
     }
   }
 }
@@ -438,5 +504,28 @@ export default {
     width: 100%;
     justify-content: flex-end;
   }
+
+  .pagination {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.loading-indicator {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 16px;
+}
+
+.no-data {
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  font-size: 16px;
+  border: 1px dashed #eee;
+  margin: 10px 0;
+}
+
 }
 </style>

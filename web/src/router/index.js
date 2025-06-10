@@ -88,16 +88,31 @@ const router = new Router({
 
 // 全局路由守卫
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = store.getters.isAuthenticated
-  const isAdmin = store.getters.isAdmin // 获取是否为管理员
-  
-  if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
-    next({ name: 'login' }) // 重定向到登录页
-  } else if (to.matched.some(record => record.meta.requiresAdmin) && !isAdmin) {
-    next({ name: 'home' }) // 如果用户不是管理员，则重定向到首页
-  } else {
-    next() // 其他情况正常放行
+  const isAuthenticated = store.getters.isAuthenticated;
+  const isAdmin = store.getters.isAdmin;
+
+  if (to.name === 'login') {
+    if (isAuthenticated) {
+      return next({ name: 'home' });
+    }
+    return next();
   }
-})
+
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!isAuthenticated) {
+      return next({
+        name: 'login',
+        query: { redirect: to.fullPath }
+      });
+    }
+
+    if (to.matched.some(record => record.meta.requiresAdmin) && !isAdmin) {
+      return next({ name: 'home' });
+    }
+  }
+
+  // 默认放行（不要加 next({ name: 'home' })，否则导致死循环）
+  next();
+});
 
 export default router

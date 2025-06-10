@@ -1,78 +1,85 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import api from '../api/index.js'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    token: '',
     user: null,
-    token: null,
-    role: null 
+    role: ''
   },
   getters: {
     isAuthenticated: state => !!state.token,
-    isAdmin: state => state.role === 'admin'
+    isAdmin: state => state.role === '1'
   },
   mutations: {
-    setUser(state, payload) {
-      state.user = payload.user
-      state.token = payload.token
-      state.role = payload.role 
+    setUser(state, { user, token, role }) {
+      state.user = user
+      state.token = token
+      state.role = role
     },
     clearAuth(state) {
       state.user = null
-      state.token = null
-      state.role = null
+      state.token = ''
+      state.role = ''
+    },
+    SET_AUTH_TOKEN(state, token) {
+      state.token = token
+    },
+    SET_USER_ROLE(state, role) {
+      state.role = role
     }
   },
   actions: {
-    login({ commit }, credentials) {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          const user = { name: credentials.username }
-          const token = 'mock-token'
-          const role = credentials.username === 'admin' ? 'admin' : 'user';  //如果用户名是admin，则是管理员
-          const loginTime = Date.now()
-          const expireTime = 20 * 60 * 1000 // 20分钟
+    async login({ commit }, credentials) {
+      try {
+        const response = await api.login(credentials.username, credentials.password);
+        console.log('登录响应:', response);
 
-          commit('setUser', { user, token, role }) 
-          localStorage.setItem('token', token)
-          localStorage.setItem('user', JSON.stringify(user))
-          localStorage.setItem('role', role) 
-          localStorage.setItem('loginTime', loginTime.toString())
-          localStorage.setItem('expireTime', expireTime.toString())
 
-          resolve()
-        }, 500)
-      })
+        const token = response.token;
+        const role = response.flag;
+        const user = { username: credentials.username };
+
+        commit('setUser', { user, token, role });
+
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('role', role);
+        localStorage.setItem('loginTime', Date.now().toString());
+        localStorage.setItem('expireTime', (20 * 60 * 1000).toString());
+
+        return Promise.resolve();
+      } catch (error) {
+        console.error('登录失败:', error);
+        return Promise.reject(error);
+      }
     },
     logout({ commit }) {
-      commit('clearAuth')
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      localStorage.removeItem('role')
-      localStorage.removeItem('loginTime')
-      localStorage.removeItem('expireTime')
+      commit('clearAuth');
+      localStorage.clear();
     },
-    initializeAuth({ commit }) {
-      const token = localStorage.getItem('token')
-      const user = JSON.parse(localStorage.getItem('user'))
-      const role = localStorage.getItem('role')
-      const loginTime = parseInt(localStorage.getItem('loginTime'), 10)
-      const expireTime = parseInt(localStorage.getItem('expireTime'), 10)
-      const now = Date.now()
 
-      if (token && user && loginTime && expireTime && now - loginTime < expireTime) {
-        commit('setUser', { user, token, role })
+
+    initializeAuth({ commit }) {
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user'));
+      const role = localStorage.getItem('role');
+      const loginTime = parseInt(localStorage.getItem('loginTime'), 10);
+      const expireTime = parseInt(localStorage.getItem('expireTime'), 10);
+      const now = Date.now();
+
+      console.log('初始化登录状态', { token, user, role, loginTime, expireTime, now });
+
+      if (token && user && now - loginTime < expireTime) {
+        commit('setUser', { user, token, role });
       } else {
-        commit('clearAuth')
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        localStorage.removeItem('role')
-        localStorage.removeItem('loginTime')
-        localStorage.removeItem('expireTime')
+        console.warn('登录信息过期或缺失，清除认证信息');
+        commit('clearAuth');
+        localStorage.clear();
       }
     }
   }
-})
-
+});

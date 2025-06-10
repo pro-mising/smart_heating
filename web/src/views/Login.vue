@@ -61,6 +61,8 @@
 </template>
 
 <script>
+//import api from '@/api/index' 
+
 export default {
   name: 'LoginPage',
   data() {
@@ -107,35 +109,33 @@ export default {
     },
     
   async handleLogin() {
-    // 验证码校验
-    if (this.form.captcha.toUpperCase() !== this.captchaText) {
-      alert('验证码错误，请重新输入！');
-      this.updateCaptcha();
-      return;
-    }
+  if (this.form.captcha.toUpperCase() !== this.captchaText) {
+    alert('验证码错误！')
+    this.updateCaptcha()
+    return
+  }
 
-    this.isLogging = true;
+  this.isLogging = true
 
-    try {
-      // 用户名是 'admin' 则为管理员角色，否则为普通用户
-      const role = this.form.username === 'admin' ? 'admin' : 'user'; 
-      await this.$store.dispatch('login', {
-        username: this.form.username,
-        password: this.form.password,
-        role: role,  // 将角色传递到 Vuex
-      });
+  try {
+    // 通过 store 调用 login action，它会处理所有状态和存储
+    await this.$store.dispatch('login', { 
+      username: this.form.username, 
+      password: this.form.password 
+    });
 
-      // 登录成功后跳转
-      const redirect = this.$route.query.redirect || (role === 'admin' ? '/admin/management' : '/');  // 根据角色跳转
-      this.$router.push(redirect);
-    } catch (error) {
-      console.error('登录失败:', error);
-      alert('登录失败，请检查用户名和密码');
-      this.updateCaptcha();
-    } finally {
-      this.isLogging = false;
-    }
-    }
+    console.log("登录后 Vuex 中的 token：", this.$store.state.token);
+
+    // 跳转
+    const redirect = this.$route.query.redirect;
+    this.$router.push(redirect ? decodeURIComponent(redirect) : { name: 'home' });
+
+  } catch (error) {
+    alert(error.message || '登录失败');
+  } finally {
+    this.isLogging = false;
+  }
+}
 
   }
 }

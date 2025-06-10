@@ -4,7 +4,7 @@ import axios from 'axios';
 const service = axios.create();
 
 function updateUserInfo(username, realname, email, phone, department) {
-    return service.post('http://127.0.0.1:3002/user/updateuser', {
+    return service.post('http://127.0.0.1:3002/user/admin/updateuser', {
         username: username,
         realname: realname,
         email: email,
@@ -17,12 +17,12 @@ function updateUserInfo(username, realname, email, phone, department) {
         }
     });
 }
-// 测试命令 node src/api/test/updateUserInfo
+// 测试命令 node src/api/test/adminUpdateUser
 
 // 测试函数
 async function runTest() {
     try {
-        const response = await updateUserInfo('nst', "倪小婷", '1017815532@qq.com', '13507429302', "技术研发部");
+        const response = await updateUserInfo('sqh', "尚小浩", '1017815532@qq.com', '13507429302', "技术研发部");
         console.log('✅ 测试成功');
         console.log('返回结果:', response.data);
 

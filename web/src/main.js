@@ -11,7 +11,7 @@ import '@/assets/global.css'
 Vue.config.productionTip = false
 
 // 初始化登录状态
-store.dispatch('initializeAuth')
+store.dispatch('initializeAuth');
 
 // axios 请求拦截器
 axios.interceptors.request.use(config => {

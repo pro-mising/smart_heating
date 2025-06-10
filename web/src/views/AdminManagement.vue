@@ -15,15 +15,6 @@
               <button class="action-btn" @click="showAddUserDialog">
                 <i class="el-icon-plus"></i> 添加用户
               </button>
-              <div class="search-box">
-                <i class="el-icon-search"></i>
-                <input 
-                  type="text" 
-                  placeholder="搜索用户..." 
-                  class="search-input" 
-                  v-model="userSearchQuery"
-                >
-              </div>
             </div>
           </div>
 
@@ -33,39 +24,19 @@
             border
             v-loading="loading"
           >
-            <el-table-column prop="username" label="用户名" width="180" />
-            <el-table-column prop="email" label="邮箱" width="220" />
-            <el-table-column prop="role" label="角色" width="120">
-              <template #default="{row}">
-                <el-tag :type="getRoleTagType(row.role)" class="role-tag">{{ row.role }}</el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column prop="createdAt" label="创建时间" width="180" />
-            <el-table-column prop="status" label="状态" width="120">
-              <template #default="{row}">
-                <el-switch
-                  v-model="row.status"
-                  active-value="active"
-                  inactive-value="inactive"
-                  active-color="#64ffda"
-                  inactive-color="#ff6b35"
-                  @change="updateUserStatus(row)"
-                />
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" width="220">
-              <template #default="{row}">
-                <button class="edit-btn" @click="editUser(row)">
-                  <i class="el-icon-edit"></i> 编辑
-                </button>
-                <button 
-                  class="delete-btn" 
-                  @click="confirmDeleteUser(row)"
-                  :disabled="row.role === 'admin'"
-                >
-                  <i class="el-icon-delete"></i> 删除
-                </button>
-              </template>
+            <!-- 你可以根据需要自定义列 -->
+            <el-table-column prop="id" label="ID" width="80"/>
+            <el-table-column prop="username" label="用户名"/>
+            <el-table-column prop="realname" label="真实姓名"/>
+            <el-table-column prop="email" label="邮箱"/>
+            <el-table-column prop="phone" label="电话"/>
+            <el-table-column prop="department" label="部门"/>
+            <el-table-column prop="roleLabel" label="权限" width="120" />
+            <el-table-column label="操作" width="180">
+               <template slot-scope="{ row }">
+                  <el-button size="mini" type="primary" @click="editUser(row)">编辑</el-button>
+                  <el-button size="mini" type="danger" @click="confirmDeleteUser(row)">删除</el-button>
+                </template>
             </el-table-column>
           </el-table>
           
@@ -81,81 +52,9 @@
             />
           </div>
         </el-tab-pane>
-        
-        <!-- 权限管理 -->
-        <el-tab-pane label="权限管理" name="permissions">
-          <div class="panel-header">
-            <h3 class="panel-title">系统权限配置</h3>
-            <div class="panel-actions">
-              <button class="action-btn" @click="savePermissions">
-                <i class="el-icon-check"></i> 保存权限
-              </button>
-              <button class="action-btn" @click="resetPermissions">
-                <i class="el-icon-refresh-left"></i> 重置
-              </button>
-            </div>
-          </div>
-
-          <el-collapse v-model="activePermissions" accordion class="permission-collapse">
-            <el-collapse-item 
-              v-for="module in permissionModules" 
-              :key="module.name"
-              :name="module.name"
-              :title="module.title"
-            >
-              <el-checkbox-group v-model="selectedPermissions" class="permission-group">
-                <div class="permission-item" v-for="perm in module.permissions" :key="perm">
-                  <el-checkbox :label="perm" class="permission-checkbox">{{ perm }}</el-checkbox>
-                </div>
-              </el-checkbox-group>
-            </el-collapse-item>
-          </el-collapse>
-        </el-tab-pane>
-        
-        <!-- 系统设置 -->
-        <el-tab-pane label="系统设置" name="settings">
-          <div class="panel-header">
-            <h3 class="panel-title">系统参数配置</h3>
-            <div class="panel-actions">
-              <button class="action-btn" @click="saveSystemSettings">
-                <i class="el-icon-check"></i> 保存设置
-              </button>
-            </div>
-          </div>
-
-          <el-form label-width="180px" label-position="left" class="settings-form">
-            <el-form-item label="系统名称">
-              <el-input v-model="systemSettings.name" class="settings-input" />
-            </el-form-item>
-            <el-form-item label="系统LOGO">
-              <el-upload
-                action=""
-                :auto-upload="false"
-                :show-file-list="false"
-                :on-change="handleLogoChange"
-                class="logo-upload"
-              >
-                <button class="upload-btn">
-                  <i class="el-icon-upload"></i> 点击上传
-                </button>
-                <div class="logo-preview" v-if="logoPreview">
-                  <img :src="logoPreview" alt="系统LOGO" />
-                </div>
-              </el-upload>
-            </el-form-item>
-            <el-form-item label="数据保留时间">
-              <el-select v-model="systemSettings.dataRetention" class="settings-select">
-                <el-option label="3个月" value="3" />
-                <el-option label="6个月" value="6" />
-                <el-option label="1年" value="12" />
-                <el-option label="永久保留" value="0" />
-              </el-select>
-            </el-form-item>
-          </el-form>
-        </el-tab-pane>
       </el-tabs>
     </div>
-    
+
     <!-- 添加/编辑用户对话框 -->
     <el-dialog 
       :title="userDialogTitle" 
@@ -167,22 +66,19 @@
         <el-form-item label="用户名" prop="username">
           <el-input v-model="currentUser.username" class="dialog-input" />
         </el-form-item>
+        <el-form-item label="真实姓名" prop="realname">
+          <el-input v-model="currentUser.realname" class="dialog-input" />
+        </el-form-item>
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="currentUser.email" class="dialog-input" />
         </el-form-item>
-        <el-form-item label="密码" prop="password" v-if="isNewUser">
-          <el-input v-model="currentUser.password" type="password" class="dialog-input" />
+        <el-form-item label="电话" prop="phone">
+          <el-input v-model="currentUser.phone" class="dialog-input" />
         </el-form-item>
-        <el-form-item label="确认密码" prop="confirmPassword" v-if="isNewUser">
-          <el-input v-model="currentUser.confirmPassword" type="password" class="dialog-input" />
+        <el-form-item label="部门" prop="department">
+          <el-input v-model="currentUser.department" class="dialog-input" />
         </el-form-item>
-        <el-form-item label="角色" prop="role">
-          <el-select v-model="currentUser.role" class="dialog-select">
-            <el-option label="管理员" value="admin" />
-            <el-option label="普通用户" value="user" />
-            <el-option label="操作员" value="operator" />
-          </el-select>
-        </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <button class="cancel-btn" @click="showUserDialog = false">取消</button>
@@ -194,6 +90,8 @@
 
 <script>
 import Navbar from '@/components/Navbar.vue'
+import api from '@/api/index.js'
+import { mapState, mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'AdminManagement',
@@ -209,77 +107,44 @@ export default {
       pageSize: 10,
       totalUsers: 0,
       users: [],
-      activePermissions: [],
-      selectedPermissions: [],
-      permissionModules: [
-        {
-          name: 'dashboard',
-          title: '仪表盘模块',
-          permissions: [
-            'dashboard_view',
-            'dashboard_export'
-          ]
-        },
-        {
-          name: 'monitor',
-          title: '监控模块',
-          permissions: [
-            'monitor_view',
-            'monitor_manage',
-            'monitor_alert'
-          ]
-        },
-        {
-          name: 'system',
-          title: '系统模块',
-          permissions: [
-            'system_settings',
-            'system_users',
-            'system_permissions'
-          ]
-        }
-      ],
-      systemSettings: {
-        name: '供暖系统管理平台',
-        logo: '',
-        dataRetention: '12'
-      },
-      logoPreview: '',
       showUserDialog: false,
       isNewUser: false,
       currentUser: {
         id: '',
         username: '',
+        realname: '',
         email: '',
-        password: '',
-        confirmPassword: '',
-        role: 'user',
-        status: 'active'
+        phone: ''
       },
+      addUserDialogVisible: false,
+      newUser: {
+      username: '',
+      realname: '',
+      phone: '',
+      email: '',
+      department: '',
+       },
       userRules: {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
           { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
         ],
+        realname: [
+          { required: true, message: '请输入真实姓名', trigger: 'blur' }
+        ],
         email: [
           { required: true, message: '请输入邮箱地址', trigger: 'blur' },
           { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
         ],
-        password: [
-          { required: true, message: '请输入密码', trigger: 'blur' },
-          { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
-        ],
-        confirmPassword: [
-          { required: true, message: '请确认密码', trigger: 'blur' },
-          { validator: this.validateConfirmPassword, trigger: 'blur' }
-        ],
-        role: [
-          { required: true, message: '请选择角色', trigger: 'change' }
+        phone: [
+          { required: true, message: '请输入电话', trigger: 'blur' }
         ]
       }
     }
   },
   computed: {
+    ...mapState(['user', 'token', 'role']),
+    ...mapGetters(['isAuthenticated', 'isAdmin']),
     filteredUsers() {
       return this.users.filter(user => 
         user.username.toLowerCase().includes(this.userSearchQuery.toLowerCase()) ||
@@ -292,63 +157,45 @@ export default {
   },
   created() {
     this.fetchUsers()
-    this.fetchPermissions()
-    this.fetchSystemSettings()
   },
   methods: {
+    ...mapActions(['login', 'logout', 'initializeAuth']),
+
     async fetchUsers() {
-      this.loading = true
-      try {
-        // 模拟API调用
-        await new Promise(resolve => setTimeout(resolve, 800))
-        this.users = [
-          {
-            id: '1',
-            username: 'admin',
-            email: 'admin@example.com',
-            role: 'admin',
-            status: 'active',
-            createdAt: '2023-01-15 10:30'
-          },
-          {
-            id: '2',
-            username: 'user1',
-            email: 'user1@example.com',
-            role: 'user',
-            status: 'active',
-            createdAt: '2023-02-20 14:15'
-          },
-          {
-            id: '3',
-            username: 'operator1',
-            email: 'operator@example.com',
-            role: 'operator',
-            status: 'inactive',
-            createdAt: '2023-03-10 09:45'
-          }
-        ]
-        this.totalUsers = this.users.length
-      } catch (error) {
-        console.error('获取用户列表失败:', error)
-        this.$message.error('获取用户列表失败')
-      } finally {
-        this.loading = false
-      }
-    },
-    async fetchPermissions() {
-      // 模拟获取权限数据
-      this.selectedPermissions = ['dashboard_view', 'monitor_view']
-    },
-    async fetchSystemSettings() {
-      // 模拟获取系统设置
-    },
-    getRoleTagType(role) {
-      switch (role) {
-        case 'admin': return 'danger'
-        case 'operator': return 'warning'
-        default: return ''
-      }
-    },
+  this.loading = true
+  try {
+    if (!this.isAuthenticated || !this.isAdmin) {
+      throw new Error('无权限访问')
+    }
+    const response = await api.getUserList()
+
+    console.log('接口返回数据:', response)
+    console.log('完整返回数据结构:', JSON.stringify(response, null, 2))
+
+    const userList = Array.isArray(response) ? response : []
+    this.users = userList.map(user => ({
+      id: user.id,
+      username: user.username,
+      realname: user.realname,
+      email: user.email || '',  
+      phone: user.phone || '',
+      department: user.department || '',
+      flag: user.flag || '0',
+      roleLabel: user.flag === '1' ? '管理员' : '普通用户'
+    }))
+
+    this.totalUsers = this.users.length
+  } catch (error) {
+    console.error('获取用户列表失败:', error)
+    this.$message.error('获取用户列表失败: ' + error.message)
+    if (error.message.includes('无权限') || error.message.includes('认证')) {
+      this.$router.push('/login')
+    }
+  } finally {
+    this.loading = false
+  }
+},
+
     handleSizeChange(val) {
       this.pageSize = val
       this.fetchUsers()
@@ -362,11 +209,9 @@ export default {
       this.currentUser = {
         id: '',
         username: '',
+        realname: '',
         email: '',
-        password: '',
-        confirmPassword: '',
-        role: 'user',
-        status: 'active'
+        phone: ''
       }
       this.showUserDialog = true
       this.$nextTick(() => {
@@ -378,95 +223,134 @@ export default {
       this.currentUser = { ...user }
       this.showUserDialog = true
     },
-    validateConfirmPassword(rule, value, callback) {
-      if (value !== this.currentUser.password) {
-        callback(new Error('两次输入密码不一致!'))
-      } else {
-        callback()
-      }
-    },
-    submitUserForm() {
-      this.$refs.userForm.validate(async valid => {
-        if (!valid) return
+
+    async submitUserForm() {
+    this.$refs.userForm.validate(async valid => {
+    if (!valid) return
+    try {
+      this.loading = true
+      if (this.isNewUser) {
+        // 添加默认密码和确保部门不为空
+        const response = await api.addUser(
+          this.currentUser.username,
+          this.currentUser.realname,
+          '123456', // 默认密码
+          this.currentUser.email,
+          this.currentUser.phone,
+          this.currentUser.department || '默认部门'
+        )
         
-        try {
-          this.loading = true
-          // 模拟API调用
-          await new Promise(resolve => setTimeout(resolve, 800))
-          
-          if (this.isNewUser) {
-            // 添加用户
-            const newUser = {
-              ...this.currentUser,
-              id: Date.now().toString(),
-              createdAt: new Date().toISOString()
-            }
-            this.users.unshift(newUser)
-            this.$message.success('用户添加成功')
-          } else {
-            // 更新用户
-            const index = this.users.findIndex(u => u.id === this.currentUser.id)
-            if (index !== -1) {
-              this.users.splice(index, 1, this.currentUser)
-            }
-            this.$message.success('用户信息更新成功')
-          }
-          
-          this.showUserDialog = false
-        } catch (error) {
-          console.error('保存用户失败:', error)
-          this.$message.error('保存用户失败')
-        } finally {
-          this.loading = false
+        console.log('Add user response:', response)
+        
+        // 错误信息
+         if (response.error_message && response.error_message !== 'success') {
+          throw new Error(response.error_message)
         }
-      })
-    },
-    confirmDeleteUser(user) {
-      this.$confirm(`确定要删除用户 "${user.username}" 吗?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-        customClass: 'confirm-dialog'
-      }).then(async () => {
-        try {
-          this.loading = true
-          // 模拟API调用
-          await new Promise(resolve => setTimeout(resolve, 500))
-          
-          this.users = this.users.filter(u => u.id !== user.id)
-          this.totalUsers = this.users.length
-          this.$message.success('用户删除成功')
-        } catch (error) {
-          console.error('删除用户失败:', error)
-          this.$message.error('删除用户失败')
-        } finally {
-          this.loading = false
+        
+        const newUser = {
+          ...this.currentUser,
+          id: response.id || response.userId, 
+          flag: '0',
+          roleLabel: '普通用户'
         }
-      }).catch(() => {})
-    },
-    updateUserStatus(user) {
-      this.$message.success(`用户 ${user.username} 状态已更新`)
-    },
-    savePermissions() {
-      this.$message.success('权限设置已保存')
-    },
-    resetPermissions() {
-      this.selectedPermissions = ['dashboard_view', 'monitor_view']
-      this.$message.info('权限设置已重置')
-    },
-    handleLogoChange(file) {
-      const reader = new FileReader()
-      reader.onload = () => {
-        this.logoPreview = reader.result
-      }
-      reader.readAsDataURL(file.raw)
-    },
-    saveSystemSettings() {
-      this.$message.success('系统设置已保存')
+        
+       this.users.unshift(newUser)
+        this.totalUsers = this.users.length
+        this.$message.success('用户添加成功')
+      } else {
+        console.log("登录后 Vuex 中的 token：", this.$store.state.token);
+        
+        const response = await api.adminUpdateUserInfo(
+      this.currentUser.username,
+      this.currentUser.realname,
+      this.currentUser.email,
+      this.currentUser.phone,
+      this.currentUser.department
+    )
+
+    // 错误日志
+    console.log('更新响应:', JSON.stringify(response, null, 2))
+    
+    if (response.error_message && response.error_message !== 'success') {
+      throw new Error(response.error_message)
     }
+    
+    //成功处理
+        if (response.error_message === 'success') {
+          this.$message.success('用户信息更新成功')
+        } else {
+          this.$message.success('用户信息更新成功')
+        }
+      }
+      
+      this.showUserDialog = false
+      this.fetchUsers()
+
+    } catch (error) {
+      console.error('保存用户失败:', error)
+      if (error.message === 'success') {
+        this.$message.success('操作成功')
+        this.showUserDialog = false
+        this.fetchUsers()
+      } else {
+        this.$message.error('保存用户失败: ' + error.message)
+      }
+    } finally {
+      this.loading = false
+    }
+  })
+},
+
+  resetAddUserForm() {
+    this.newUser = {
+      username: '',
+      realname: '',
+      phone: '',
+      email: '',
+      department: '',
+    }
+  },
+
+    async confirmDeleteUser(user) {
+  this.$confirm(`确定要删除用户 "${user.username}" 吗?`, '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    try {
+      this.loading = true
+      const response = await api.removeUser(user.username)
+      
+      // 检查响应结果
+      if (response.error_message && response.error_message !== 'success') {
+        throw new Error(response.error_message)
+      }
+      
+      // 从本地列表中移除
+      this.users = this.users.filter(u => u.id !== user.id)
+      this.totalUsers = this.users.length
+      
+      // 特殊处理"success"消息
+      if (response.error_message === 'success') {
+        this.$message.success('用户删除成功')
+      } else {
+        this.$message.success('用户删除成功')
+      }
+    } catch (error) {
+      console.error('删除用户失败:', error)
+      this.$message.error('删除用户失败: ' + 
+        (error.response?.data?.message || error.message))
+    } finally {
+      this.loading = false
+    }
+  }).catch(() => {
+    this.$message.info('已取消删除')
+  })
+  }
   }
 }
 </script>
+
 
 <style scoped>
 .admin-management-container {

@@ -12,7 +12,7 @@
             <label>预测时间范围</label>
             <select class="form-control" v-model="forecastRange">
               <option value="1">未来1小时</option>
-              <option value="12">未来12小时</option>
+              <option value="12">未来7小时</option>
               <option value="24">未来24小时</option>
             </select>
           </div>
@@ -36,7 +36,7 @@
             </select>
           </div>
 
-           <div class="form-group">
+          <div class="form-group">
             <label>选择地址</label>
             <select class="form-control" v-model="address">
               <option value="fuli">富力小学</option>
@@ -52,16 +52,33 @@
           <button class="btn" style="width: 100%;" @click="generateReport">生成预测报告</button>
         </div>
 
-        <div class="chart-container">
-          <div class="chart-placeholder" v-if="!chartData">
-            预测数据可视化图表将在此显示
+        <div class="data-container">
+          <div class="data-placeholder" v-if="!reportData">
+            预测数据报告将在此显示
           </div>
           <div v-else>
-            <div class="chart-wrapper">
-              <h3>预测趋势图</h3>
-              <div class="mock-chart"></div>
-            </div>
-          </div>
+    <div class="report-section">
+      <h3>预测结果数据表</h3>
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>地址</th>
+              <th>时间点</th>
+              <th>热负荷预测值(kW)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in reportData.forecast" :key="index">
+              <td>{{ getAddressName(address) }}</td>
+              <td>{{ item.time }}</td>
+              <td>{{ item.value.toFixed(2) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
           <div class="data-cards">
             <div class="data-card">
@@ -115,12 +132,13 @@ export default {
       forecastRange: '24',
       weatherSource: 'cma',
       historyRange: '1',
+      address: 'fuli',
       modelMetrics: {
         loss: 0.0,
         valAccuracy: 0.0,
         rmse: 0.0
       },
-      chartData: null,
+      reportData: null,
       showLoadingDialog: false,
       progressPercent: 0,
       progressStatus: 'success',
@@ -130,11 +148,24 @@ export default {
         { percent: 40, text: '正在预处理数据...' },
         { percent: 60, text: '正在训练预测模型...' },
         { percent: 80, text: '正在生成预测结果...' },
-        { percent: 100, text: '正在生成可视化报告...' }
+        { percent: 100, text: '正在生成数据报告...' }
       ]
     }
   },
   methods: {
+    getAddressName(value) {
+      const addresses = {
+        fuli: '富力小学',
+        jiaotong: '交通小学',
+        jiefang: '解放小学',
+        menggu: '蒙古族中学',
+        shijie: '施介小学',
+        shigao: '实验高级中学',
+        shixiao: '实验小学'
+      };
+      return addresses[value] || value;
+    },
+    
     async generateReport() {
       this.showLoadingDialog = true
       this.progressPercent = 0
@@ -146,25 +177,54 @@ export default {
       }
       
       try {
-        //const params = {
-        //  range: this.forecastRange,
-        //  source: this.weatherSource,
-        //  history: this.historyRange
-        //}
-        
-        // 这里替换为实际的API调用
-        // const response = await api.getForecastData(params)
-        // this.modelMetrics = response.data.metrics
-        // this.chartData = response.data.chart
-        
         // 模拟API返回数据
         await new Promise(resolve => setTimeout(resolve, 500))
+        
+        // 生成模拟预测数据
+        const forecast = []
+        const now = new Date()
+        const hours = parseInt(this.forecastRange)
+        
+        for (let i = 1; i <= hours; i++) {
+          const time = new Date(now.getTime() + i * 60 * 60 * 1000)
+          const value = 50 + Math.random() * 50
+          forecast.push({
+            time: time.toLocaleTimeString(),
+            value: value,
+            lower: value * (0.9 + Math.random() * 0.05),
+            upper: value * (1.1 + Math.random() * 0.05),
+            accuracy: 0.8 + Math.random() * 0.15
+          })
+        }
+        
+        // 计算统计摘要
+        const values = forecast.map(item => item.value)
+        const sum = values.reduce((a, b) => a + b, 0)
+        const mean = sum / values.length
+        const sorted = [...values].sort((a, b) => a - b)
+        const median = sorted[Math.floor(sorted.length / 2)]
+        const min = Math.min(...values)
+        const max = Math.max(...values)
+        const std = Math.sqrt(values.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / values.length)
+        const cv = std / mean
+        
+        this.reportData = {
+          forecast: forecast,
+          summary: {
+            mean,
+            median,
+            min,
+            max,
+            std,
+            cv
+          }
+        }
+        
         this.modelMetrics = {
           loss: Math.random() * 0.5,
           valAccuracy: 0.85 + Math.random() * 0.1,
           rmse: 2.5 + Math.random() * 1.5
         }
-        this.chartData = { /* 图表数据 */ }
         
         this.$message.success('预测报告生成成功')
       } catch (error) {
@@ -187,15 +247,6 @@ export default {
           resolve()
         }, 800)
       })
-    },
-    
-    // 预留接收报告数据的接口
-    receiveReportData(reportData) {
-      this.modelMetrics = reportData.metrics || {}
-      this.chartData = reportData.chart || null
-      if (reportData.success) {
-        this.$message.success('报告数据接收成功')
-      }
     }
   }
 }
@@ -270,7 +321,7 @@ export default {
   box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
 }
 
-.chart-container {
+.data-container {
   background: rgba(16, 36, 69, 0.8);
   border-radius: 12px;
   padding: 20px;
@@ -278,7 +329,7 @@ export default {
   min-height: 500px;
 }
 
-.chart-placeholder {
+.data-placeholder {
   background: rgba(10, 25, 47, 0.3);
   border: 2px dashed #1f3a68;
   border-radius: 8px;
@@ -288,6 +339,70 @@ export default {
   align-items: center;
   color: rgba(204, 214, 246, 0.5);
   font-size: 18px;
+}
+
+.data-table-wrapper {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 15px;
+  background: rgba(10, 25, 47, 0.3);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #ccd6f6;
+}
+
+.data-table th, .data-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #1f3a68;
+}
+
+.data-table th {
+  background: rgba(16, 36, 69, 0.8);
+  color: #64ffda;
+  position: sticky;
+  top: 0;
+}
+
+.data-table tr:hover {
+  background: rgba(100, 255, 218, 0.1);
+}
+
+.summary-section {
+  margin-top: 30px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.summary-item {
+  background: rgba(10, 25, 47, 0.3);
+  border-radius: 6px;
+  padding: 15px;
+  border: 1px solid #1f3a68;
+}
+
+.summary-label {
+  display: block;
+  color: rgba(204, 214, 246, 0.7);
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.summary-value {
+  display: block;
+  color: #64ffda;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 .data-cards {
@@ -322,13 +437,6 @@ export default {
   font-size: 14px;
 }
 
-.mock-chart {
-  height: 300px;
-  background: rgba(10, 25, 47, 0.3);
-  border-radius: 8px;
-  margin-top: 20px;
-}
-
 .loading-content {
   text-align: center;
 }
@@ -343,8 +451,12 @@ export default {
     grid-template-columns: 1fr;
   }
   
-  .data-cards {
+  .data-cards, .summary-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .data-table-wrapper {
+    overflow-x: auto;
   }
 }
 </style>
