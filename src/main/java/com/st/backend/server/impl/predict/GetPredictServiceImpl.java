@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +42,8 @@ public class GetPredictServiceImpl implements GetPredictService {
             map.put("loss_value", String.valueOf(predict.getLoss()));
             map.put("accuracy", String.valueOf(predict.getAccuracy()));
             map.put("rmse", String.valueOf(predict.getRmse()));
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            map.put("predict_time", sdf.format(predict.getPredictTime()));
             return map;
         }
 
