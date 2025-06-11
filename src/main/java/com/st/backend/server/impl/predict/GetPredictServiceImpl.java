@@ -37,6 +37,10 @@ public class GetPredictServiceImpl implements GetPredictService {
         if(predict!=null){
             map.put("error_message", "success");
             map.put("heat_load", String.valueOf(predict.getHeatLoad()));
+            map.put("address", predict.getAddress());
+            map.put("loss_value", String.valueOf(predict.getLoss()));
+            map.put("accuracy", String.valueOf(predict.getAccuracy()));
+            map.put("rmse", String.valueOf(predict.getRmse()));
             return map;
         }
 

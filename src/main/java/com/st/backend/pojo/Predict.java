@@ -14,5 +14,8 @@ public class Predict {
     private Integer id;
     private String address;
     private Double heatLoad;
+    private Double loss;
+    private Double accuracy;
+    private Double rmse;
     private String time;
 }
