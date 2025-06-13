@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -22,7 +23,7 @@ public class GetPredictServiceImpl implements GetPredictService {
     private PredictMapper predictMapper;
 
     @Override
-    public Map<String, String>getPredictList(String address, String time) {
+    public List<Predict> getPredictList(String address) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl loggedUser = (UserDetailsImpl) authenticationToken.getPrincipal();
@@ -33,21 +34,9 @@ public class GetPredictServiceImpl implements GetPredictService {
         QueryWrapper<Predict> queryWrapper = new QueryWrapper<>();
 
         queryWrapper.eq("address",address);
-        queryWrapper.eq("time",time);
-        Predict predict = predictMapper.selectOne(queryWrapper);
-        if(predict!=null){
-            map.put("error_message", "success");
-            map.put("heat_load", String.valueOf(predict.getHeatLoad()));
-            map.put("address", predict.getAddress());
-            map.put("loss_value", String.valueOf(predict.getLoss()));
-            map.put("accuracy", String.valueOf(predict.getAccuracy()));
-            map.put("rmse", String.valueOf(predict.getRmse()));
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            map.put("predict_time", sdf.format(predict.getPredictTime()));
-            return map;
-        }
+        List<Predict> predicts = predictMapper.selectList(queryWrapper);
+        System.out.println(predicts);
 
-        map.put("error_message", "没有查询到此条消息");
-        return map;
+        return predicts;
     }
 }

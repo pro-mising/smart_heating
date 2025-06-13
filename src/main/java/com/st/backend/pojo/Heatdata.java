@@ -22,5 +22,4 @@ public class Heatdata {
     private Double outdoorTemperature;
     private Double heatLoad;
     private String wind;
-
 }
