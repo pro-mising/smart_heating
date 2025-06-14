@@ -57,12 +57,13 @@ export default new Vuex.Store({
         return Promise.reject(error);
       }
     },
+
     logout({ commit }) {
       commit('clearAuth');
       localStorage.clear();
     },
 
-
+    // 初始化认证状态（页面刷新时调用）
     initializeAuth({ commit }) {
       const token = localStorage.getItem('token');
       const user = JSON.parse(localStorage.getItem('user'));

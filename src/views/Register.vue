@@ -18,6 +18,18 @@
             required
           >
         </div>
+
+        <div class="form-group">
+          <label for="name">真实姓名</label>
+          <input 
+            type="text" 
+            id="name"
+            v-model="form.name" 
+            class="form-control"
+            placeholder="请输入姓名"
+            required
+          >
+        </div>
         
         <div class="form-group">
           <label for="email">电子邮箱</label>
@@ -27,6 +39,30 @@
             v-model="form.email" 
             class="form-control"
             placeholder="请输入邮箱"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="phone">联系电话</label>
+          <input 
+            type="phone" 
+            id="phone"
+            v-model="form.phone" 
+            class="form-control"
+            placeholder="请输入联系电话"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="work">所属部门</label>
+          <input 
+            type="work" 
+            id="work"
+            v-model="form.work" 
+            class="form-control"
+            placeholder="请输入所属部门"
             required
           >
         </div>
@@ -97,7 +133,7 @@ export default {
       this.isRegistering = true
       
       try {
-        // 模拟注册过程
+        // 注册过程
         await new Promise(resolve => setTimeout(resolve, 1000))
         alert('注册成功！请登录')
         this.$router.push('/login')
@@ -120,6 +156,7 @@ export default {
   background: #0a192f;
 }
 
+/*认证卡片设计*/
 .auth-card {
   width: 400px;
   background: rgba(16, 36, 69, 0.8);
@@ -148,6 +185,7 @@ export default {
   font-size: 14px;
 }
 
+/*表单样式*/
 .form-group {
   margin-bottom: 20px;
 }
@@ -176,6 +214,7 @@ export default {
   box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
 }
 
+/*按钮样式*/
 .btn {
   width: 100%;
   padding: 14px;
@@ -201,6 +240,7 @@ export default {
   box-shadow: none;
 }
 
+/*页脚链接样式*/
 .footer-links {
   margin-top: 25px;
   text-align: center;

@@ -21,9 +21,6 @@
             <button class="action-btn" @click="refreshData">
               <i class="el-icon-refresh"></i> 刷新
             </button>
-            <button class="action-btn" @click="exportData">
-              <i class="el-icon-download"></i> 导出
-            </button>
           </div>
         </div>
 

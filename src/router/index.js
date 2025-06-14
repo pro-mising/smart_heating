@@ -10,7 +10,7 @@ import AlertDetail from '../views/AlertDetail.vue'
 import DeviceDetail from '../views/DeviceDetail.vue'
 import AdminManagement from '../views/AdminManagement.vue'
 
-import store from '../store' 
+import store from '../store'
 
 Vue.use(Router)
 
@@ -21,13 +21,13 @@ const router = new Router({
       path: '/',
       name: 'home',
       component: Home,
-      meta: { requiresAuth: true } 
+      meta: { requiresAuth: true }
     },
     {
       path: '/login',
       name: 'login',
       component: Login,
-      meta: { guest: true } 
+      meta: { guest: true }
     },
     {
       path: '/monitor',
@@ -72,16 +72,16 @@ const router = new Router({
       meta: { requiresAuth: true }
     },
     {
-    path: '/register',
-    name: 'register',
-    component: () => import('../views/Register.vue'),
-    meta: { guest: true } // 仅未登录可访问
+      path: '/register',
+      name: 'register',
+      component: () => import('../views/Register.vue'),
+      meta: { guest: true } // 仅未登录可访问
     },
     {
-    path: '/forgot-password',
-    name: 'forgot-password',
-    component: () => import('../views/ForgotPassword.vue'),
-    meta: { guest: true }
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: () => import('../views/ForgotPassword.vue'),
+      meta: { guest: true }
     }
   ]
 })
@@ -111,7 +111,7 @@ router.beforeEach((to, from, next) => {
     }
   }
 
-  // 默认放行（不要加 next({ name: 'home' })，否则导致死循环）
+  // 默认放行
   next();
 });
 

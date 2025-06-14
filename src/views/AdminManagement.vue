@@ -7,6 +7,7 @@
 
     <div class="admin-content-wrapper">
       <el-tabs v-model="activeTab" class="admin-tabs">
+        
         <!-- 用户管理 -->
         <el-tab-pane label="用户管理" name="users">
           <div class="panel-header">
@@ -24,7 +25,7 @@
             border
             v-loading="loading"
           >
-            <!-- 你可以根据需要自定义列 -->
+            
             <el-table-column prop="id" label="ID" width="80"/>
             <el-table-column prop="username" label="用户名"/>
             <el-table-column prop="realname" label="真实姓名"/>
@@ -235,8 +236,8 @@ export default {
           this.currentUser.username,
           this.currentUser.realname,
           '123456', // 默认密码
-          this.currentUser.email,
           this.currentUser.phone,
+          this.currentUser.email,
           this.currentUser.department || '默认部门'
         )
         
@@ -263,8 +264,8 @@ export default {
         const response = await api.adminUpdateUserInfo(
       this.currentUser.username,
       this.currentUser.realname,
-      this.currentUser.email,
       this.currentUser.phone,
+      this.currentUser.email,
       this.currentUser.department
     )
 

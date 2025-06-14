@@ -228,7 +228,7 @@ export default {
   methods: {
     selectDevice(device) {
       this.selectedDevice = device
-      // 这里可以加载设备的当前设置
+      // 可以加载设备的当前设置
     },
     adjustRoomTemp(change) {
       this.roomTemp += change

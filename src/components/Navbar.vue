@@ -44,13 +44,15 @@ export default {
     document.removeEventListener('click', this.closeDropdown)
   },
   methods: {
-    
+
+    // 切换下拉菜单显示状态
     toggleDropdown(e) {
       e.stopPropagation() // 阻止事件冒泡
       this.showDropdown = !this.showDropdown
     },
     
     closeDropdown(e) {
+      // 判断点击位置是否在组件外部
       if (!this.$el.contains(e.target)) {
         this.showDropdown = false
       }
@@ -121,13 +123,15 @@ export default {
 }
 
 .nav-links a:hover {
-  color: #00d4ff;
+  color: #00d4ff;/* 悬停时颜色变化 */
 }
 
+/* 当前激活路由的样式 */
 .nav-links a.router-link-exact-active {
   color: #00d4ff;
 }
 
+/* 当前激活路由的下划线效果 */
 .nav-links a.router-link-exact-active::after {
   content: '';
   position: absolute;
